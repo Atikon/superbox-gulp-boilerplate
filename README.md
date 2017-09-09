@@ -2,11 +2,18 @@
 
 A Gulp boilerplate for creating new web projects with JavaScript, LESS and SVG sprites.
 
-
-
 ## Getting Started
 
-Documentation coming soon ... Work in progress ...
+### Dependencies
+
+- [Node.js](http://nodejs.org)
+- [Gulp](http://gulpjs.com) `sudo npm install -g gulp`
+
+### Quick Start
+
+1. In terminal, `cd` into your project directory.
+2. Run `npm install` to install required file.
+3. Start watchtask with `gulp` or `gulp dev`.
 
 ## File Structure
 
@@ -36,6 +43,10 @@ Documentation coming soon ... Work in progress ...
 |—— package.json
 |—— README.md
 ```
+
+## License
+
+The code is available under the [MIT License](LICENSE.md).
 
 ## Todo
 
