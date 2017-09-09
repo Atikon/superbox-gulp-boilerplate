@@ -8,6 +8,6 @@ The filename is equal to the ID in SVG Sprite.
 
 ```html
 <svg height="70" width="350">
-    <use xlink:href="sprite.svg#superbox"></use>
+    <use xlink:href="/static/svg/sprite.svg#superbox"></use>
 </svg>
 ```
