@@ -25,13 +25,13 @@ A Gulp boilerplate for creating new web projects with JavaScript, LESS and SVG s
 |   |—— img/
 |   |   |—— # image files
 |   |—— js/
-|       |—— import/
-|           |—— # JavaScript files
+|   |   |—— import/
+|   |   |   |—— # JavaScript files
 |   |   |—— main.js
 |   |   |—— main.min.js
 |   |—— less/
-|       |—— import/
-|           |—— # LESS files
+|   |   |—— import/
+|   |   |   |—— # LESS files
 |   |   |—— main.less
 |   |—— svg/
 |   |   |—— # SVG files
