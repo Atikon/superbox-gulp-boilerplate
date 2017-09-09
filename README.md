@@ -12,8 +12,8 @@ A Gulp boilerplate for creating new web projects with JavaScript, LESS and SVG s
 ### Quick Start
 
 1. In terminal, `cd` into your project directory.
-2. Run `npm install` to install required file.
-3. Start watchtask with `gulp` or `gulp dev`.
+2. Run `npm install` to install required files.
+3. Start watch task with `gulp` or `gulp dev`.
 
 ## File Structure
 
@@ -51,3 +51,4 @@ The code is available under the [MIT License](LICENSE.md).
 ## Todo
 
 * Add Gulp plugin for image optimization (gif, png, jpg)
+* Add support for multiple JavaScript files
