@@ -1,6 +1,6 @@
 {
     "name": "superbox-gulp",
-    "version": "1.0.0a",
+    "version": "1.0.0a2",
     "description": "Gulp for web projects with JavaScript, LESS and SVG sprites.",
     "author": "Michael Hacker",
     "homepage": "https://www.superbox.one",
