@@ -2,6 +2,8 @@
 
 A Gulp boilerplate for creating new web projects with JavaScript, LESS and SVG sprites.
 
+
+
 ## Getting Started
 
 Documentation coming soon ... Work in progress ...
@@ -16,14 +18,16 @@ Documentation coming soon ... Work in progress ...
 |   |—— img/
 |   |   |—— # image files
 |   |—— js/
+|       |—— import/
+|           |—— # JavaScript files
 |   |   |—— main.js
 |   |   |—— main.min.js
 |   |—— less/
 |       |—— import/
-|           |—— # less files
+|           |—— # LESS files
 |   |   |—— main.less
 |   |—— svg/
-|   |   |—— # svg files
+|   |   |—— # SVG files
 |   |   |—— sprite.svg
 |—— .browserslistrc
 |—— .eslintrc.json
