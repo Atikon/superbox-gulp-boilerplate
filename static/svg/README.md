@@ -1,6 +1,6 @@
 # SVG sprite
 
-All SVG files automatically merged in the sprite.svg file.
+All SVG files are automatically merged into the file sprite.svg.
 
 ## Usage Example
 
