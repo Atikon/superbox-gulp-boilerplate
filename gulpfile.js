@@ -30,7 +30,7 @@ var paths = {
 
 // Check JavaScript syntax
 
-gulp.task('check-js-syntax', function() {
+gulp.task('lint-js', function() {
     return gulp.src([
             paths.js + '**/*.js',
             '!' + paths.js + 'main.min.js'
@@ -41,9 +41,9 @@ gulp.task('check-js-syntax', function() {
         .pipe(gulp_plumber.stop());
 });
 
-// Generates a main.min.js
+// Compile a main.min.js
 
-gulp.task('generate-js', ['check-js-syntax'], function() {
+gulp.task('generate-js', ['lint-js'], function() {
     return gulp.src([
             paths.js + '**/*.js',
             '!' + paths.js + 'main.min.js'
@@ -54,9 +54,9 @@ gulp.task('generate-js', ['check-js-syntax'], function() {
         .pipe(gulp_plumber.stop());
 });
 
-// Generates a uglified main.min.js
+// Compile a uglified main.min.js
 
-gulp.task('generate-uglified-js', ['check-js-syntax'], function() {
+gulp.task('generate-uglified-js', ['lint-js'], function() {
     return gulp.src([
             paths.js + '**/*.js',
             '!' + paths.js + 'main.min.js'
@@ -70,7 +70,7 @@ gulp.task('generate-uglified-js', ['check-js-syntax'], function() {
 
 // Check less syntax
 
-gulp.task('check-less-syntax', function() {
+gulp.task('lint-less', function() {
     return gulp.src(paths.less + '**/*.less')
         .pipe(gulp_plumber())
         .pipe(gulp_lesshint())
@@ -80,7 +80,7 @@ gulp.task('check-less-syntax', function() {
 
 // Compile less files
 
-gulp.task('compile-less', function() {
+gulp.task('compile-less', ['lint-less'], function() {
     return gulp.src(paths.less + '*.less')
         .pipe(gulp_plumber())
         .pipe(gulp_less({
@@ -95,7 +95,7 @@ gulp.task('compile-less', function() {
 
 // Generates a css with PostCSS
 
-gulp.task('generate-css', ['check-less-syntax', 'compile-less'], function() {
+gulp.task('generate-css', ['compile-less'], function() {
     return gulp.src(paths.css + '*.min.css')
         .pipe(gulp_plumber())
         .pipe(gulp_postcss([
@@ -107,7 +107,7 @@ gulp.task('generate-css', ['check-less-syntax', 'compile-less'], function() {
 
 // Generates a minified css with PostCSS
 
-gulp.task('generate-minified-css', ['check-less-syntax', 'compile-less'], function() {
+gulp.task('generate-minified-css', ['compile-less'], function() {
     return gulp.src(paths.css + '*.min.css')
         .pipe(gulp_plumber())
         .pipe(gulp_postcss([
@@ -159,7 +159,7 @@ gulp.task('dev', function() {
 
 gulp.task('default', function() {
     gulp.watch(paths.img + '**/*.svg', ['generate-minified-svg']);
-    gulp.watch(paths.js + '**/*.js', ['generate-uglified-js']);
+    gulp.watch([paths.js + 'import/**/*.js', paths.js + 'main.js'], ['generate-uglified-js']);
     gulp.watch(paths.less + '**/*.less', ['generate-minified-css']);
     gulp.watch(paths.svg + '**/*.svg', ['generate-svg-sprite']);
 });
