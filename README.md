@@ -8,6 +8,7 @@ Documentation coming soon ... Work in progress ...
 
 ## File Structure
 
+```
 .
 |—— static/
 |   |—— css/
@@ -30,6 +31,7 @@ Documentation coming soon ... Work in progress ...
 |—— gulfile.js
 |—— package.json
 |—— README.md
+```
 
 ## Todo
 
