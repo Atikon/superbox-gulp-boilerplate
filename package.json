@@ -5,6 +5,10 @@
     "author": "Michael Hacker",
     "homepage": "https://www.superbox.one",
     "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/michael-hacker/gulp-boilerplate.git"
+    },
     "devDependencies": {
         "autoprefixer": "^7.1.4",
         "gulp": "^3.9.1",
