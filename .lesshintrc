@@ -1,0 +1,9 @@
+{
+    "propertyUnits": {
+        "invalid": ["px"]
+    },
+    "spaceAroundComma": {
+        "allowNewline": true,
+        "style": "after"
+    }
+}
