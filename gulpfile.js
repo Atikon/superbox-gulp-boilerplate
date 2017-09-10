@@ -17,6 +17,7 @@ var autoprefixer = require("autoprefixer"),
     gulpif = require("gulp-if"),
     less = require("gulp-less"),
     lesshint = require("gulp-lesshint"),
+    notify = require("gulp-notify"),
     plumber = require("gulp-plumber"),
     postcss = require("gulp-postcss"),
     rename = require("gulp-rename"),
@@ -54,18 +55,29 @@ gulp.task("optimize-svg", function() {
             paths.images.input + "**/*.svg",
             "!" + paths.images.input + "svg_sprite/*.svg"
         ])
-        .pipe(plumber())
+        .pipe(plumber({
+            "errorHandler": notify.onError({
+                "title": "Optimizing SVGs failed",
+                "message": "<%= error.message %>"
+            })
+        }))
         .pipe(svgo())
-        .pipe(gulp.dest(paths.images.output));
+        .pipe(gulp.dest(paths.images.output))
+        .pipe(notify({"message": "Successfully optimized SVGs"}));
 });
 
-// Compile SVG sprite
+// Create SVG sprite
 
-gulp.task("compile-svg-sprite", function() {
+gulp.task("create-svg-sprite", function() {
     del.sync(paths.images.output);
 
     return gulp.src(paths.images.input + "svg_sprite/*.svg")
-        .pipe(plumber())
+        .pipe(plumber({
+            "errorHandler": notify.onError({
+                "title": "Creating SVG sprite failed",
+                "message": "<%= error.message %>"
+            })
+        }))
         .pipe(svg_sprite({
             "mode": {
                 "symbol": {
@@ -74,7 +86,8 @@ gulp.task("compile-svg-sprite", function() {
                 }
             }
         }))
-        .pipe(gulp.dest(paths.images.output));
+        .pipe(gulp.dest(paths.images.output))
+        .pipe(notify({"message": "Successfully created SVG sprite"}));
 });
 
 // Lint JavaScript
@@ -92,7 +105,12 @@ gulp.task("compile-js", ["lint-js"], function() {
     del.sync(paths.scripts.output);
 
     return gulp.src(paths.scripts.input + "*")
-        .pipe(plumber())
+        .pipe(plumber({
+            "errorHandler": notify.onError({
+                "title": "Compiling JavaScript failed",
+                "message": "<%= error.message %>"
+            })
+        }))
         .pipe(tap(function(file) {
             if (file.isDirectory()) {
                 return gulp.src(file.path + "/*.js")
@@ -106,13 +124,17 @@ gulp.task("compile-js", ["lint-js"], function() {
                 .pipe(rename({ "suffix": ".min" }))
                 .pipe(gulpif(argv.production, uglify()))
                 .pipe(gulp.dest(paths.scripts.output));
+        }))
+        .pipe(notify({
+            "message": "Successfully compiled JavaScript",
+            "onLast": true
         }));
 });
 
 // Lint Less
 
 gulp.task("lint-less", function() {
-    return gulp.src(paths.less + "**/*.less")
+    return gulp.src(paths.styles.input + "**/*.less")
         .pipe(plumber())
         .pipe(lesshint())
         .pipe(lesshint.reporter());
@@ -132,17 +154,23 @@ gulp.task("compile-less", ["lint-less"], function() {
     }
 
     return gulp.src(paths.styles.input + "*.less")
-        .pipe(plumber())
+        .pipe(plumber({
+            "errorHandler": notify.onError({
+                "title": "Compiling Less failed",
+                "message": "<%= error.message %>"
+            })
+        }))
         .pipe(less({"paths": [ paths.styles.input + "import/**/" ]}))
         .pipe(rename({ "suffix": ".min" }))
         .pipe(postcss(processors))
-        .pipe(gulp.dest(paths.styles.output));
+        .pipe(gulp.dest(paths.styles.output))
+        .pipe(notify({"message": "Successfully compiled Less"}));
 });
 
 // Tasks
 
 gulp.task("compile", [
-    "compile-svg-sprite",
+    "create-svg-sprite",
     "compile-js",
     "compile-less"
 ]);
@@ -152,8 +180,11 @@ gulp.task("default", [
 ]);
 
 gulp.task("watch", function() {
-    gulp.watch(paths.images.input + "**/*.svg", ["optimize-svg"]);
-    gulp.watch(paths.images.input + "svg_sprite/*.svg", ["compile-svg-sprite"]);
+    gulp.watch([
+        paths.images.input + "**/*.svg",
+        "!" + paths.images.input + "svg_sprite/*.svg"
+    ], ["optimize-svg"]);
+    gulp.watch(paths.images.input + "svg_sprite/*.svg", ["create-svg-sprite"]);
     gulp.watch(paths.styles.input + "**/*.less", ["compile-less"]);
     gulp.watch(paths.scripts.input + "/*", ["compile-js"]);
 });
