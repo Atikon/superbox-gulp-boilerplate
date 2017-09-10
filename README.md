@@ -35,6 +35,10 @@ Comming soon - Work in Progress
 
 Default is development mode. Run `gulp --production` it will minify your JavaScript and CSS.
 
+## Features
+
+* Gulp.js [Less](https://www.npmjs.org/package/gulp-less)
+
 ## File Structure
 
 Comming soon - Work in Progress
