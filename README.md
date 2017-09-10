@@ -15,6 +15,10 @@ A Gulp boilerplate for creating new web projects with JavaScript, LESS and SVG s
 2. Run `npm install` to install required files.
 3. Start watch task with `gulp` or `gulp dev`.
 
+## Features
+
+* Gulp.js [Less](https://www.npmjs.org/package/gulp-less)
+
 ## File Structure
 
 ```
