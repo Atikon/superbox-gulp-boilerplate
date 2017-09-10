@@ -1,165 +1,159 @@
 /* global require */
 
-'use strict';
+"use strict";
+
+// Arguments
+
+var argv = require("yargs").argv;
 
 // Packages
 
-var gulp = require('gulp'),
-    gulp_concat = require('gulp-concat'),
-    gulp_eslint = require('gulp-eslint'),
-    gulp_less = require('gulp-less'),
-    gulp_lesshint = require('gulp-lesshint'),
-    gulp_plumber = require('gulp-plumber'),
-    gulp_postcss = require('gulp-postcss'),
-    gulp_rename = require('gulp-rename'),
-    gulp_svg_sprite = require('gulp-svg-sprite'),
-    gulp_svgo = require('gulp-svgo'),
-    gulp_uglify = require('gulp-uglify'),
-    postcss_autoprefixer = require('autoprefixer'),
-    postcss_csso = require('postcss-csso');
+var autoprefixer = require("autoprefixer"),
+    concat = require("gulp-concat"),
+    csso = require("postcss-csso"),
+    del = require("del"),
+    eslint = require("gulp-eslint"),
+    gulp = require("gulp"),
+    gulpif = require("gulp-if"),
+    less = require("gulp-less"),
+    lesshint = require("gulp-lesshint"),
+    plumber = require("gulp-plumber"),
+    postcss = require("gulp-postcss"),
+    rename = require("gulp-rename"),
+    svg_sprite = require("gulp-svg-sprite"),
+    svgo = require("gulp-svgo"),
+    tap = require("gulp-tap"),
+    uglify = require("gulp-uglify");
 
 // Paths
 
 var paths = {
-    css: 'static/css/',
-    img: 'static/img/',
-    js: 'static/js/',
-    less: 'static/less/',
-    svg: 'static/svg/',
+    "images": {
+        "input": "src/images/",
+        "output": "dist/images/",
+    },
+    "scripts": {
+        "input": "src/scripts/",
+        "output": "dist/scripts/"
+    },
+    "styles": {
+        "input": "src/styles/",
+        "output": "dist/styles/"
+    }
 };
 
-// Check JavaScript syntax
+// Optimize SVG
 
-gulp.task('lint-js', function() {
+gulp.task("optimize-svg", function() {
+    del.sync([
+        paths.images.output + "**/*.svg",
+        "!" + paths.images.output + "sprite.symbol.svg"
+    ])
+
     return gulp.src([
-            paths.js + '**/*.js',
-            '!' + paths.js + 'main.min.js'
+            paths.images.input + "**/*.svg",
+            "!" + paths.images.input + "svg_sprite/*.svg"
         ])
-        .pipe(gulp_plumber())
-        .pipe(gulp_eslint())
-        .pipe(gulp_eslint.format())
-        .pipe(gulp_plumber.stop());
+        .pipe(plumber())
+        .pipe(svgo())
+        .pipe(gulp.dest(paths.images.output));
 });
 
-// Compile a main.min.js
+// Compile SVG sprite
 
-gulp.task('generate-js', ['lint-js'], function() {
-    return gulp.src([
-            paths.js + '**/*.js',
-            '!' + paths.js + 'main.min.js'
-        ])
-        .pipe(gulp_plumber())
-        .pipe(gulp_concat('main.min.js'))
-        .pipe(gulp.dest(paths.js))
-        .pipe(gulp_plumber.stop());
-});
+gulp.task("compile-svg-sprite", function() {
+    del.sync(paths.images.output);
 
-// Compile a uglified main.min.js
-
-gulp.task('generate-uglified-js', ['lint-js'], function() {
-    return gulp.src([
-            paths.js + '**/*.js',
-            '!' + paths.js + 'main.min.js'
-        ])
-        .pipe(gulp_plumber())
-        .pipe(gulp_concat('main.min.js'))
-        .pipe(gulp_uglify())
-        .pipe(gulp.dest(paths.js))
-        .pipe(gulp_plumber.stop());
-});
-
-// Check less syntax
-
-gulp.task('lint-less', function() {
-    return gulp.src(paths.less + '**/*.less')
-        .pipe(gulp_plumber())
-        .pipe(gulp_lesshint())
-        .pipe(gulp_lesshint.reporter())
-        .pipe(gulp_plumber.stop());
-});
-
-// Compile less files
-
-gulp.task('compile-less', ['lint-less'], function() {
-    return gulp.src(paths.less + '*.less')
-        .pipe(gulp_plumber())
-        .pipe(gulp_less({
-            paths: [paths.less + 'import/**/'],
-        }))
-        .pipe(gulp_rename({
-            suffix: '.min'
-        }))
-        .pipe(gulp.dest(paths.css))
-        .pipe(gulp_plumber.stop());
-});
-
-// Generates a css with PostCSS
-
-gulp.task('generate-css', ['compile-less'], function() {
-    return gulp.src(paths.css + '*.min.css')
-        .pipe(gulp_plumber())
-        .pipe(gulp_postcss([
-            postcss_autoprefixer(),
-        ]))
-        .pipe(gulp.dest(paths.css))
-        .pipe(gulp_plumber.stop());
-});
-
-// Generates a minified css with PostCSS
-
-gulp.task('generate-minified-css', ['compile-less'], function() {
-    return gulp.src(paths.css + '*.min.css')
-        .pipe(gulp_plumber())
-        .pipe(gulp_postcss([
-            postcss_autoprefixer(),
-            postcss_csso(),
-        ]))
-        .pipe(gulp.dest(paths.css))
-        .pipe(gulp_plumber.stop());
-});
-
-// Generates a svg sprite
-
-gulp.task('generate-svg-sprite', function() {
-    return gulp.src([
-            paths.svg + '**/*.svg',
-            '!' + paths.svg + 'sprite.svg'
-        ])
-        .pipe(gulp_plumber())
-        .pipe(gulp_svg_sprite({
-            'mode': {
-                'symbol': {
-                    'dest': '',
-                    'sprite': 'sprite.svg',
+    return gulp.src(paths.images.input + "svg_sprite/*.svg")
+        .pipe(plumber())
+        .pipe(svg_sprite({
+            "mode": {
+                "symbol": {
+                    "dest": "",
+                    "sprite": "sprite.symbol.svg"
                 }
             }
         }))
-        .pipe(gulp.dest(paths.svg))
-        .pipe(gulp_plumber.stop());
+        .pipe(gulp.dest(paths.images.output));
 });
 
-// Generates a minified svg
+// Lint JavaScript
 
-gulp.task('generate-minified-svg', function() {
-    return gulp.src(paths.img + '**/*.svg')
-        .pipe(gulp_plumber())
-        .pipe(gulp_svgo())
-        .pipe(gulp.dest(paths.img))
-        .pipe(gulp_plumber.stop());
+gulp.task("lint-js", function() {
+    return gulp.src(paths.scripts.input + "**/*.js")
+        .pipe(plumber())
+        .pipe(eslint())
+        .pipe(eslint.format());
 });
 
-// Watch tasks
+// Minify and concatenate JavaScripts
 
-gulp.task('dev', function() {
-    gulp.watch(paths.img + '**/*.svg', ['generate-minified-svg']);
-    gulp.watch(paths.js + '**/*.js', ['generate-js']);
-    gulp.watch(paths.less + '**/*.less', ['generate-css']);
-    gulp.watch(paths.svg + '**/*.svg', ['generate-svg-sprite']);
+gulp.task("compile-js", ["lint-js"], function() {
+    del.sync(paths.scripts.output);
+
+    return gulp.src(paths.scripts.input + "*")
+        .pipe(plumber())
+        .pipe(tap(function(file) {
+            if (file.isDirectory()) {
+                return gulp.src(file.path + "/*.js")
+                    .pipe(concat(file.relative + ".js"))
+                    .pipe(rename({ "suffix": ".min" }))
+                    .pipe(gulpif(argv.production, uglify()))
+                    .pipe(gulp.dest(paths.scripts.output));
+            }
+
+            return gulp.src(file.path)
+                .pipe(rename({ "suffix": ".min" }))
+                .pipe(gulpif(argv.production, uglify()))
+                .pipe(gulp.dest(paths.scripts.output));
+        }));
 });
 
-gulp.task('default', function() {
-    gulp.watch(paths.img + '**/*.svg', ['generate-minified-svg']);
-    gulp.watch([paths.js + 'import/**/*.js', paths.js + 'main.js'], ['generate-uglified-js']);
-    gulp.watch(paths.less + '**/*.less', ['generate-minified-css']);
-    gulp.watch(paths.svg + '**/*.svg', ['generate-svg-sprite']);
+// Lint Less
+
+gulp.task("lint-less", function() {
+    return gulp.src(paths.less + "**/*.less")
+        .pipe(plumber())
+        .pipe(lesshint())
+        .pipe(lesshint.reporter());
+});
+
+// Compile Less files
+
+gulp.task("compile-less", ["lint-less"], function() {
+    del.sync(paths.styles.output);
+
+    var processors = [
+        autoprefixer
+    ];
+
+    if (argv.production) {
+        processors.push(csso)
+    }
+
+    return gulp.src(paths.styles.input + "*.less")
+        .pipe(plumber())
+        .pipe(less({"paths": [ paths.styles.input + "import/**/" ]}))
+        .pipe(rename({ "suffix": ".min" }))
+        .pipe(postcss(processors))
+        .pipe(gulp.dest(paths.styles.output));
+});
+
+// Tasks
+
+gulp.task("compile", [
+    "compile-svg-sprite",
+    "compile-js",
+    "compile-less"
+]);
+
+gulp.task("default", [
+    "compile"
+]);
+
+gulp.task("watch", function() {
+    gulp.watch(paths.images.input + "**/*.svg", ["optimize-svg"]);
+    gulp.watch(paths.images.input + "svg_sprite/*.svg", ["compile-svg-sprite"]);
+    gulp.watch(paths.styles.input + "**/*.less", ["compile-less"]);
+    gulp.watch(paths.scripts.input + "/*", ["compile-js"]);
 });
