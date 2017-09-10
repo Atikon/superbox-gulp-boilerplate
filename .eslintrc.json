@@ -3,6 +3,8 @@
     "rules": {
         "eqeqeq": "error",
         "indent": "off",
+        "max-len": "error",
+        "max-lines": "error",
         "no-else-return": "error",
         "no-extra-parens": "error",
         "no-lonely-if": "error",
