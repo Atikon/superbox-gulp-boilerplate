@@ -28,16 +28,14 @@ Comming soon - Work in Progress
 
 ### Tasks
 
-* watch: Watches all declared source files for changes and triggers compilation
-* compile: Compiles sources
+| Tasks | Description |
+|---|---|
+|__`compile`__| Compiles sources |
+|__`watch`__| Watches all declared source files for changes and triggers compilation |
 
 ### Development and production
 
 Default is development mode. Run `gulp --production` it will minify your JavaScript and CSS.
-
-## Features
-
-* Gulp.js [Less](https://www.npmjs.org/package/gulp-less)
 
 ## File Structure
 
