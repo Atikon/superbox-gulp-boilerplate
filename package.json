@@ -1,5 +1,5 @@
 {
-    "name": "superbox-gulp",
+    "name": "superbox-gulp-boilerplate",
     "version": "1.0.0a2",
     "description": "Gulp for web projects with JavaScript, LESS and SVG sprites.",
     "author": "Michael Hacker",
@@ -9,11 +9,12 @@
         "type": "git",
         "url": "https://github.com/michael-hacker/gulp-boilerplate.git"
     },
-    "devDependencies": {
+    "dependencies": {
         "autoprefixer": "^7.1.4",
         "gulp": "^3.9.1",
         "gulp-concat": "^2.6.1",
         "gulp-eslint": "^4.0.0",
+        "gulp-if": "^2.0.2",
         "gulp-imageoptim": "^1.0.9",
         "gulp-less": "^3.3.2",
         "gulp-lesshint": "^4.0.0",
@@ -22,7 +23,9 @@
         "gulp-rename": "^1.2.2",
         "gulp-svg-sprite": "^1.3.7",
         "gulp-svgo": "^1.2.5",
+        "gulp-tap": "^1.0.1",
         "gulp-uglify": "^3.0.0",
-        "postcss-csso": "^2.0.0"
+        "postcss-csso": "^2.0.0",
+        "yargs": "^8.0.2"
     }
 }
