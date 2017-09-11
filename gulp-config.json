@@ -1,0 +1,16 @@
+{
+  "paths": {
+    "images": {
+      "input": "src/images/",
+      "output": "dist/images/"
+    },
+    "scripts": {
+      "input": "src/scripts/",
+      "output": "dist/scripts/"
+    },
+    "styles": {
+      "input": "src/styles/",
+      "output": "dist/styles/"
+    }
+  }
+}

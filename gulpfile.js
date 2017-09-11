@@ -22,51 +22,38 @@ var plumber = require("gulp-plumber");
 var postcss = require("gulp-postcss");
 var rename = require("gulp-rename");
 var svg_sprite = require("gulp-svg-sprite");
-var svgmin = require('gulp-svgmin');
+var svgmin = require("gulp-svgmin");
 var tap = require("gulp-tap");
 var uglify = require("gulp-uglify");
 
-// Paths
+// Config
 
-var paths = {
-    "images": {
-        "input": "src/images/",
-        "output": "dist/images/",
-    },
-    "scripts": {
-        "input": "src/scripts/",
-        "output": "dist/scripts/"
-    },
-    "styles": {
-        "input": "src/styles/",
-        "output": "dist/styles/"
-    }
-};
+var config = require("./gulp-config.json");
 
 // Optimize SVG
 
 gulp.task("optimize-svg", function() {
     del.sync([
-        paths.images.output + "**/*.svg",
-        "!" + paths.images.output + "sprite.symbol.svg"
+        config.paths.images.output + "**/*.svg",
+        "!" + config.paths.images.output + "sprite.symbol.svg"
     ])
 
     return gulp.src([
-            paths.images.input + "**/*.svg",
-            "!" + paths.images.input + "svg_sprite/*.svg"
+            config.paths.images.input + "**/*.svg",
+            "!" + config.paths.images.input + "svg_sprite/*.svg"
         ])
         .pipe(plumber())
         .pipe(svgmin())
-        .pipe(gulp.dest(paths.images.output))
+        .pipe(gulp.dest(config.paths.images.output))
         .pipe(notify({"message": "Successfully optimized SVGs"}));
 });
 
 // Create SVG sprite
 
 gulp.task("create-svg-sprite", function() {
-    del.sync(paths.images.output);
+    del.sync(config.paths.images.output);
 
-    return gulp.src(paths.images.input + "svg_sprite/*.svg")
+    return gulp.src(config.paths.images.input + "svg_sprite/*.svg")
         .pipe(plumber({
             "errorHandler": notify.onError({
                 "title": "SVG Sprite Error",
@@ -81,14 +68,14 @@ gulp.task("create-svg-sprite", function() {
                 }
             }
         }))
-        .pipe(gulp.dest(paths.images.output))
+        .pipe(gulp.dest(config.paths.images.output))
         .pipe(notify({"message": "Successfully created SVG sprite"}));
 });
 
 // Lint JavaScript
 
 gulp.task("lint-js", function() {
-    return gulp.src(paths.scripts.input + "**/*.js")
+    return gulp.src(config.paths.scripts.input + "**/*.js")
         .pipe(plumber())
         .pipe(eslint())
         .pipe(eslint.format())
@@ -103,9 +90,9 @@ gulp.task("lint-js", function() {
 // Minify and concatenate JavaScripts
 
 gulp.task("compile-js", ["lint-js"], function() {
-    del.sync(paths.scripts.output);
+    del.sync(config.paths.scripts.output);
 
-    return gulp.src(paths.scripts.input + "*")
+    return gulp.src(config.paths.scripts.input + "*")
         .pipe(plumber())
         .pipe(tap(function(file) {
             if (file.isDirectory()) {
@@ -113,13 +100,13 @@ gulp.task("compile-js", ["lint-js"], function() {
                     .pipe(concat(file.relative + ".js"))
                     .pipe(rename({ "suffix": ".min" }))
                     .pipe(gulpif(argv.production, uglify()))
-                    .pipe(gulp.dest(paths.scripts.output));
+                    .pipe(gulp.dest(config.paths.scripts.output));
             }
 
             return gulp.src(file.path)
                 .pipe(rename({ "suffix": ".min" }))
                 .pipe(gulpif(argv.production, uglify()))
-                .pipe(gulp.dest(paths.scripts.output));
+                .pipe(gulp.dest(config.paths.scripts.output));
         }))
         .pipe(notify({
             "message": "Successfully compiled JavaScript",
@@ -130,7 +117,7 @@ gulp.task("compile-js", ["lint-js"], function() {
 // Lint Less
 
 gulp.task("lint-less", function() {
-    return gulp.src(paths.styles.input + "**/*.less")
+    return gulp.src(config.paths.styles.input + "**/*.less")
         .pipe(plumber())
         .pipe(lesshint())
         .pipe(lesshint.reporter());
@@ -139,7 +126,7 @@ gulp.task("lint-less", function() {
 // Compile Less files
 
 gulp.task("compile-less", ["lint-less"], function() {
-    del.sync(paths.styles.output);
+    del.sync(config.paths.styles.output);
 
     var processors = [
         autoprefixer
@@ -149,17 +136,17 @@ gulp.task("compile-less", ["lint-less"], function() {
         processors.push(csso)
     }
 
-    return gulp.src(paths.styles.input + "*.less")
+    return gulp.src(config.paths.styles.input + "*.less")
         .pipe(plumber({
             "errorHandler": notify.onError({
                 "title": "Less Error",
                 "message": "<%= error.message %>"
             })
         }))
-        .pipe(less({"paths": [ paths.styles.input + "import/**/" ]}))
+        .pipe(less({"paths": [ config.paths.styles.input + "import/**/" ]}))
         .pipe(rename({ "suffix": ".min" }))
         .pipe(postcss(processors))
-        .pipe(gulp.dest(paths.styles.output))
+        .pipe(gulp.dest(config.paths.styles.output))
         .pipe(notify({"message": "Successfully compiled Less"}));
 });
 
@@ -177,10 +164,14 @@ gulp.task("default", [
 
 gulp.task("watch", function() {
     gulp.watch([
-        paths.images.input + "**/*.svg",
-        "!" + paths.images.input + "svg_sprite/*.svg"
+        config.paths.images.input + "**/*.svg",
+        "!" + config.paths.images.input + "svg_sprite/*.svg"
     ], ["optimize-svg"]);
-    gulp.watch(paths.images.input + "svg_sprite/*.svg", ["create-svg-sprite"]);
-    gulp.watch(paths.styles.input + "**/*.less", ["compile-less"]);
-    gulp.watch(paths.scripts.input + "/*", ["compile-js"]);
+
+    gulp.watch(
+        config.paths.images.input + "svg_sprite/*.svg", ["create-svg-sprite"]
+    );
+
+    gulp.watch(config.paths.styles.input + "**/*.less", ["compile-less"]);
+    gulp.watch(config.paths.scripts.input + "/*", ["compile-js"]);
 });
