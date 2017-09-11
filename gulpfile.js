@@ -8,23 +8,23 @@ var argv = require("yargs").argv;
 
 // Packages
 
-var autoprefixer = require("autoprefixer"),
-    concat = require("gulp-concat"),
-    csso = require("postcss-csso"),
-    del = require("del"),
-    eslint = require("gulp-eslint"),
-    gulp = require("gulp"),
-    gulpif = require("gulp-if"),
-    less = require("gulp-less"),
-    lesshint = require("gulp-lesshint"),
-    notify = require("gulp-notify"),
-    plumber = require("gulp-plumber"),
-    postcss = require("gulp-postcss"),
-    rename = require("gulp-rename"),
-    svg_sprite = require("gulp-svg-sprite"),
-    svgo = require("gulp-svgo"),
-    tap = require("gulp-tap"),
-    uglify = require("gulp-uglify");
+var autoprefixer = require("autoprefixer");
+var concat = require("gulp-concat");
+var csso = require("postcss-csso");
+var del = require("del");
+var eslint = require("gulp-eslint");
+var gulp = require("gulp");
+var gulpif = require("gulp-if");
+var less = require("gulp-less");
+var lesshint = require("gulp-lesshint");
+var notify = require("gulp-notify");
+var plumber = require("gulp-plumber");
+var postcss = require("gulp-postcss");
+var rename = require("gulp-rename");
+var svg_sprite = require("gulp-svg-sprite");
+var svgmin = require('gulp-svgmin');
+var tap = require("gulp-tap");
+var uglify = require("gulp-uglify");
 
 // Paths
 
@@ -55,13 +55,8 @@ gulp.task("optimize-svg", function() {
             paths.images.input + "**/*.svg",
             "!" + paths.images.input + "svg_sprite/*.svg"
         ])
-        .pipe(plumber({
-            "errorHandler": notify.onError({
-                "title": "Optimizing SVGs failed",
-                "message": "<%= error.message %>"
-            })
-        }))
-        .pipe(svgo())
+        .pipe(plumber())
+        .pipe(svgmin())
         .pipe(gulp.dest(paths.images.output))
         .pipe(notify({"message": "Successfully optimized SVGs"}));
 });
@@ -74,7 +69,7 @@ gulp.task("create-svg-sprite", function() {
     return gulp.src(paths.images.input + "svg_sprite/*.svg")
         .pipe(plumber({
             "errorHandler": notify.onError({
-                "title": "Creating SVG sprite failed",
+                "title": "SVG Sprite Error",
                 "message": "<%= error.message %>"
             })
         }))
@@ -96,7 +91,13 @@ gulp.task("lint-js", function() {
     return gulp.src(paths.scripts.input + "**/*.js")
         .pipe(plumber())
         .pipe(eslint())
-        .pipe(eslint.format());
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError())
+        .on("error", notify.onError({
+                "title": "JavaScript Error",
+                "message": "<%= error.message %>"
+            })
+        );
 });
 
 // Minify and concatenate JavaScripts
@@ -105,12 +106,7 @@ gulp.task("compile-js", ["lint-js"], function() {
     del.sync(paths.scripts.output);
 
     return gulp.src(paths.scripts.input + "*")
-        .pipe(plumber({
-            "errorHandler": notify.onError({
-                "title": "Compiling JavaScript failed",
-                "message": "<%= error.message %>"
-            })
-        }))
+        .pipe(plumber())
         .pipe(tap(function(file) {
             if (file.isDirectory()) {
                 return gulp.src(file.path + "/*.js")
@@ -156,7 +152,7 @@ gulp.task("compile-less", ["lint-less"], function() {
     return gulp.src(paths.styles.input + "*.less")
         .pipe(plumber({
             "errorHandler": notify.onError({
-                "title": "Compiling Less failed",
+                "title": "Less Error",
                 "message": "<%= error.message %>"
             })
         }))
